@@ -74,7 +74,7 @@ for i, (filename, superpixels) in enumerate(zip(sp_fns, sections)):
                            dtype=int)
     unique_bod = np.arange(start_body, start_body + num_components,
                            dtype=int)
-    section = np.zeros_like(unique_sps)
+    section = np.empty_like(unique_sps)
     section.fill(i)
 
     # add to the sp2seg and seg2bod maps
