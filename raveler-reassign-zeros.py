@@ -88,7 +88,7 @@ for i, (filename, superpixels) in enumerate(zip(sp_fns, sections)):
 sp2seg = np.concatenate(sp2seg_new, axis=0)
 # sort by section
 sp2seg = sp2seg[np.argsort(sp2seg[:, 0]), :]
-seg2bod = np.concatenate(seg2bod, axis=0)
+seg2bod = np.concatenate(seg2bod_new, axis=0)
 
 np.savetxt(os.path.join(outdir, sp_to_seg_file), sp2seg,
            fmt='%i', delimiter='\t')
