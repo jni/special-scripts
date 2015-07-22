@@ -7,6 +7,7 @@ import skimage as ski
 import skimage.io
 import skimage.util
 import skimage.measure
+from scipy import ndimage as ndi
 
 indir = '/groups/flyem/data/temp/ordishc/exports/raveler_export_for davi'
 outdir = '/groups/saalfeld/home/nuneziglesiasj/data/raveler_export_davi_v7'
@@ -53,14 +54,10 @@ for i, (filename, superpixels) in enumerate(zip(sp_fns, sections)):
     #   * find connected components -> label image
     #   * add max superpixel id to label image, except where 0
 
-    labels = ski.measure.label(bg_superpixels, background=0)
-    num_components = np.max(labels)
-
-    labels[labels == -1] = 0
-    labels[labels > 0] += max_superpixel_id
-
+    labels, num_components = ndi.label(bg_superpixels)
     replace = labels > 0
     labels = labels[replace]
+    labels += max_superpixel_id
     superpixels[replace, 0] = labels % (1<<8)
     superpixels[replace, 1] = (labels % (1<<16)) // (1<<8)
     superpixels[replace, 2] = labels // (1<<16)
