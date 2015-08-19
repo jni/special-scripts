@@ -13,6 +13,9 @@ indir = '/groups/flyem/data/temp/ordishc/exports/raveler_export_for davi'
 outdir = '/groups/saalfeld/home/nuneziglesiasj/data/raveler_export_davi_v7'
 os.makedirs(os.path.join(outdir, 'superpixel_maps'), exist_ok=True)
 
+# Every section must have one zero pixel, so choose a uniform, sacrificial pixel.
+zero_pixel = [0, 0]
+
 sp_fns = sorted(os.listdir(os.path.join(indir, 'superpixel_maps')))
 sp_to_seg_file = 'superpixel_to_segment_map.txt'
 seg_to_body_file = 'segment_to_body_map.txt'
@@ -61,6 +64,8 @@ for i, (filename, superpixels) in enumerate(zip(sp_fns, sections)):
     superpixels[replace, 0] = labels % (1<<8)
     superpixels[replace, 1] = (labels % (1<<16)) // (1<<8)
     superpixels[replace, 2] = labels // (1<<16)
+
+    superpixels[zero_pixel[0], zero_pixel[1], 0:3] = [0, 0, 0]
 
     ski.io.imsave(os.path.join(outdir, 'superpixel_maps', filename),
                   superpixels)
