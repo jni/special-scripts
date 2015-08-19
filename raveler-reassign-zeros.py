@@ -33,7 +33,7 @@ start_body = max_body_id + 1
 
 sp2seg = np.loadtxt(os.path.join(indir, sp_to_seg_file),
                     dtype=int, delimiter='\t')
-max_segment_id = np.max(sp2seg[:, 2])
+max_segment_id = max(np.max(seg2bod[:, 0]), np.max(sp2seg[:, 2]))
 start_segment = max_segment_id + 1
 # section boundaries in superpixel-to-segment map table
 sec_idxs = np.unique(sp2seg[:, 0], return_index=True)[1]
@@ -49,7 +49,7 @@ for i, (filename, superpixels) in enumerate(zip(sp_fns, sections)):
 
     # find max superpixel id and create background map
     superpixel_map = np.sum(superpixels * [1, 1<<8, 1<<16, 0], axis=-1)
-    max_superpixel_id = np.max(superpixel_map)
+    max_superpixel_id = max(np.max(superpixel_map), np.max(sp2seg[sp2seg[:, 0] == i, 1]))
     bg_superpixels = (superpixel_map == 0)
 
     # find all connected components of background
