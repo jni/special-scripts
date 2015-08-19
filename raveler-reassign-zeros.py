@@ -13,6 +13,9 @@ indir = '/groups/flyem/data/temp/ordishc/exports/raveler_export_for davi'
 outdir = '/groups/saalfeld/home/nuneziglesiasj/data/raveler_export_davi_v7'
 os.makedirs(os.path.join(outdir, 'superpixel_maps'), exist_ok=True)
 
+# Every section must have one zero pixel, so choose a uniform, sacrificial pixel.
+zero_pixel = [0, 0]
+
 sp_fns = sorted(os.listdir(os.path.join(indir, 'superpixel_maps')))
 sp_to_seg_file = 'superpixel_to_segment_map.txt'
 seg_to_body_file = 'segment_to_body_map.txt'
@@ -30,7 +33,7 @@ start_body = max_body_id + 1
 
 sp2seg = np.loadtxt(os.path.join(indir, sp_to_seg_file),
                     dtype=int, delimiter='\t')
-max_segment_id = np.max(sp2seg[:, 2])
+max_segment_id = max(np.max(seg2bod[:, 0]), np.max(sp2seg[:, 2]))
 start_segment = max_segment_id + 1
 # section boundaries in superpixel-to-segment map table
 sec_idxs = np.unique(sp2seg[:, 0], return_index=True)[1]
@@ -46,7 +49,7 @@ for i, (filename, superpixels) in enumerate(zip(sp_fns, sections)):
 
     # find max superpixel id and create background map
     superpixel_map = np.sum(superpixels * [1, 1<<8, 1<<16, 0], axis=-1)
-    max_superpixel_id = np.max(superpixel_map)
+    max_superpixel_id = max(np.max(superpixel_map), np.max(sp2seg[sp2seg[:, 0] == i, 1]))
     bg_superpixels = (superpixel_map == 0)
 
     # find all connected components of background
@@ -61,6 +64,8 @@ for i, (filename, superpixels) in enumerate(zip(sp_fns, sections)):
     superpixels[replace, 0] = labels % (1<<8)
     superpixels[replace, 1] = (labels % (1<<16)) // (1<<8)
     superpixels[replace, 2] = labels // (1<<16)
+
+    superpixels[zero_pixel[0], zero_pixel[1], 0:3] = [0, 0, 0]
 
     ski.io.imsave(os.path.join(outdir, 'superpixel_maps', filename),
                   superpixels)
